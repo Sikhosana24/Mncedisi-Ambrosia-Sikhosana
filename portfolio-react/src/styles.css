@@ -1,13 +1,13 @@
 ﻿:root {
   --ink: #0c0f1a;
   --light: #f6f3ef;
-  --accent: #ff7847;
-  --accent-2: #1dd3b0;
+  --accent: #8b5cf6;
+  --accent-2: #c084fc;
   --navy: #11162a;
   --glass: rgba(255, 255, 255, 0.08);
   --line: rgba(255, 255, 255, 0.2);
   --shadow: 0 30px 80px rgba(9, 12, 24, 0.35);
-  --glow: 0 0 40px rgba(255, 120, 71, 0.18);
+  --glow: 0 0 40px rgba(139, 92, 246, 0.18);
   --panel: rgba(14, 18, 34, 0.78);
   --panel-light: rgba(255, 255, 255, 0.9);
   --muted: rgba(246, 243, 239, 0.7);
@@ -21,9 +21,9 @@ body[data-theme="light"] {
   --line: rgba(15, 18, 30, 0.12);
   --shadow: 0 30px 80px rgba(15, 18, 30, 0.15);
   --glow: 0 0 40px rgba(255, 120, 71, 0.25);
-  background: radial-gradient(circle at top left, rgba(255, 120, 71, 0.25), transparent 45%),
-    radial-gradient(circle at 20% 50%, rgba(29, 211, 176, 0.2), transparent 40%),
-    linear-gradient(120deg, #f6f2ee, #fefaf7 50%, #f1ece7);
+  background: radial-gradient(circle at top left, rgba(139, 92, 246, 0.22), transparent 45%),
+    radial-gradient(circle at 20% 50%, rgba(192, 132, 252, 0.18), transparent 40%),
+    linear-gradient(120deg, #f6f2ff, #fdfbff 50%, #f0ecfa);
   color: #0b0d13;
 }
 
@@ -43,7 +43,7 @@ body {
   font-family: "Space Grotesk", sans-serif;
   background: radial-gradient(circle at top left, rgba(255, 120, 71, 0.25), transparent 45%),
     radial-gradient(circle at 20% 50%, rgba(29, 211, 176, 0.2), transparent 40%),
-    linear-gradient(120deg, #0b0e1a, #131a2f 50%, #0b0e1a);
+    linear-gradient(120deg, #0b0617, #140d2a 50%, #0b0617);
   color: var(--light);
   min-height: 100vh;
   overflow-x: hidden;
@@ -89,7 +89,7 @@ a:hover {
 .orb-1 {
   width: 260px;
   height: 260px;
-  background: radial-gradient(circle, rgba(255, 120, 71, 0.7), transparent 60%);
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.7), transparent 60%);
   top: -60px;
   right: 5%;
 }
@@ -97,7 +97,7 @@ a:hover {
 .orb-2 {
   width: 180px;
   height: 180px;
-  background: radial-gradient(circle, rgba(29, 211, 176, 0.7), transparent 60%);
+  background: radial-gradient(circle, rgba(192, 132, 252, 0.7), transparent 60%);
   bottom: 10%;
   left: 4%;
   animation-delay: -6s;
@@ -509,22 +509,22 @@ body[data-theme="light"] .testimonial-card {
 }
 
 .cover-movies {
-  background: linear-gradient(135deg, rgba(255, 120, 71, 0.35), rgba(12, 15, 26, 0.9)),
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.35), rgba(12, 15, 26, 0.9)),
     url("https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=60") center/cover;
 }
 
 .cover-streaming {
-  background: linear-gradient(135deg, rgba(29, 211, 176, 0.35), rgba(12, 15, 26, 0.9)),
+  background: linear-gradient(135deg, rgba(192, 132, 252, 0.35), rgba(12, 15, 26, 0.9)),
     url("https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=60") center/cover;
 }
 
 .cover-commerce {
-  background: linear-gradient(135deg, rgba(255, 221, 87, 0.35), rgba(12, 15, 26, 0.9)),
+  background: linear-gradient(135deg, rgba(167, 139, 250, 0.35), rgba(12, 15, 26, 0.9)),
     url("https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=60") center/cover;
 }
 
 .cover-studio {
-  background: linear-gradient(135deg, rgba(90, 140, 255, 0.35), rgba(12, 15, 26, 0.9)),
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.35), rgba(12, 15, 26, 0.9)),
     url("https://images.unsplash.com/photo-1487014679447-9f8336841d58?auto=format&fit=crop&w=600&q=60") center/cover;
 }
 
@@ -535,7 +535,7 @@ body[data-theme="light"] .testimonial-card {
   right: -30%;
   width: 180px;
   height: 180px;
-  background: radial-gradient(circle, rgba(255, 120, 71, 0.18), transparent 70%);
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.18), transparent 70%);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -663,7 +663,7 @@ body[data-theme="light"] .testimonial-company {
   justify-content: space-between;
   align-items: center;
   gap: 24px;
-  background: linear-gradient(120deg, rgba(255, 120, 71, 0.15), rgba(29, 211, 176, 0.12));
+  background: linear-gradient(120deg, rgba(139, 92, 246, 0.15), rgba(192, 132, 252, 0.12));
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: var(--glow);
 }
@@ -785,3 +785,4 @@ body[data-theme="light"] .footer {
     gap: 16px;
   }
 }
+
