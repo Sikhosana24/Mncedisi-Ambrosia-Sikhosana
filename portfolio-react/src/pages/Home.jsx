@@ -1,567 +1,701 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import * as THREE from "three";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
+import { BokehPass } from "three/examples/jsm/postprocessing/BokehPass.js";
 
-const emailAddress = "ambrosiasikhosaana@gmail.com";
+const navItems = ["Home", "About", "Portfolio", "Skills", "Contact"];
 
-const projects = [
+const latestProjects = [
   {
-    tag: "Movie Discovery",
-    title: "AmbroMovies",
-    description:
-      "A cinematic movie discovery experience with curated lists, trailers, and fast search.",
-    link: "https://moviesite-blue-chi.vercel.app",
-    role: "Full Stack Developer",
-    timeline: "2025",
-    stack: ["React", "REST APIs", "Vite", "Responsive UI"],
-    outcome: "Delivered a premium movie discovery flow with fast search and curated experiences.",
-    cover: "cover-movies",
-    points: [
-      "React frontend with responsive UI",
-      "API-driven movie data & filters",
-      "Performance-focused page loads",
-    ],
+    title: "App Design",
+    subtitle: "Cinematic UI systems with bold storytelling.",
   },
   {
-    tag: "Streaming Platform",
-    title: "AmbroCast",
-    description:
-      "A modern streaming hub with hero content, featured shows, and smooth navigation flows.",
-    link: "https://ambrocast-site.vercel.app",
-    role: "Frontend Developer",
-    timeline: "2025",
-    stack: ["React", "Motion UI", "Design System"],
-    outcome: "Built a cinematic layout with high-impact hero moments and clear navigation.",
-    cover: "cover-streaming",
-    points: [
-      "Cinematic layout system",
-      "Component-driven UI",
-      "Responsive and accessible design",
-    ],
-  },
-  {
-    tag: "E-commerce",
-    title: "CommerceFlow",
-    description:
-      "A clean storefront experience with product discovery and conversion-focused layouts.",
-    link: "https://e-commerce-plum-three-77.vercel.app",
-    role: "Frontend Developer",
-    timeline: "2024",
-    stack: ["React", "Product UI", "UX Optimization"],
-    outcome: "Improved shopping flow clarity with product-first layouts and mobile polish.",
-    cover: "cover-commerce",
-    points: [
-      "Product grids + filters",
-      "Conversion-ready UI patterns",
-      "Mobile-first experience",
-    ],
-  },
-  {
-    tag: "Full Stack Practice",
-    title: "StudioStream",
-    description:
-      "A future-ready concept for memberships, livestreams, and digital products.",
-    role: "Full Stack Developer",
-    timeline: "2024",
-    stack: ["Remix", "GraphQL", "Redis", "Subscriptions"],
-    outcome: "Designed a scalable architecture blueprint for creator monetization.",
-    cover: "cover-studio",
-    points: [
-      "Remix + GraphQL API",
-      "Redis caching + WebSockets",
-      "Subscriptions + usage-based billing",
-    ],
+    title: "Web Design",
+    subtitle: "Neon interfaces tuned for conversion and clarity.",
   },
 ];
 
-const skillGroups = [
-  {
-    title: "Frontend Engineering",
-    body: "HTML5, CSS3, modern JavaScript, TypeScript, React, Next.js, Vue, accessibility, responsive UI, design systems, animation.",
-  },
-  {
-    title: "Backend Engineering",
-    body: "Node.js, Express, NestJS, Python, FastAPI, REST, GraphQL, authentication, authorization, background jobs, queues.",
-  },
-  {
-    title: "Databases & Data",
-    body: "PostgreSQL, MySQL, MongoDB, Redis, Prisma, SQL optimization, caching strategies, ETL pipelines.",
-  },
-  {
-    title: "Cloud & DevOps",
-    body: "AWS, Azure, Vercel, Docker, CI/CD, serverless, infrastructure as code, monitoring, logging, observability.",
-  },
-  {
-    title: "Security & Quality",
-    body: "OWASP, secure API design, encryption, testing (unit/integration/e2e), QA automation, performance testing.",
-  },
-  {
-    title: "Product & Collaboration",
-    body: "UX strategy, stakeholder alignment, agile delivery, roadmap planning, documentation, mentoring teams.",
-  },
+const skillIcons = [
+  { name: "Figma", logo: "https://raw.githubusercontent.com/devicons/devicon/master/icons/figma/figma-original.svg" },
+  { name: "Blender", logo: "https://raw.githubusercontent.com/devicons/devicon/master/icons/blender/blender-original.svg" },
+  { name: "After Effects", logo: "https://raw.githubusercontent.com/devicons/devicon/master/icons/aftereffects/aftereffects-original.svg" },
+  { name: "Lottie", logo: "https://raw.githubusercontent.com/airbnb/lottie-web/master/docs/_assets/lottie-logo.svg" },
+  { name: "React", logo: "https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg" },
+  { name: "Vite", logo: "https://raw.githubusercontent.com/devicons/devicon/master/icons/vitejs/vitejs-original.svg" },
+  { name: "Tailwind CSS", logo: "https://raw.githubusercontent.com/devicons/devicon/master/icons/tailwindcss/tailwindcss-plain.svg" },
+  { name: "Framer Motion", logo: "https://raw.githubusercontent.com/devicons/devicon/master/icons/framermotion/framermotion-original.svg" },
+  { name: "GSAP", logo: "https://raw.githubusercontent.com/greensock/GSAP/master/assets/gsap-logo.svg" },
+  { name: "Three.js", logo: "https://raw.githubusercontent.com/devicons/devicon/master/icons/threejs/threejs-original.svg" },
 ];
 
-const processSteps = [
+const specialties = [
   {
-    step: "01",
-    title: "Discovery & Strategy",
-    text: "Define the product narrative, user flows, and measurable KPIs before we ship a single line of code.",
+    title: "UI/UX Design",
+    text: "Interface systems, product storytelling, and prototyping.",
   },
   {
-    step: "02",
-    title: "Design & Build",
-    text: "Design systems, modular services, and experience-led frontends built with maintainable architecture.",
+    title: "Web Development",
+    text: "High-performance React builds with scalable architecture.",
   },
   {
-    step: "03",
-    title: "Launch & Scale",
-    text: "CI/CD automation, monitoring, and performance optimization to keep your product future-proof.",
+    title: "Motion Graphics",
+    text: "Micro-interactions, animated branding, and cinematic flow.",
   },
-];
-
-const innovations = [
-  {
-    title: "Experience Lab",
-    text: "Micro-interactions, kinetic typography, and dynamic storytelling that makes your product unforgettable.",
-  },
-  {
-    title: "Data Storytelling",
-    text: "Executive dashboards that turn complex data into clear, persuasive narratives.",
-  },
-  {
-    title: "AI-Ready Systems",
-    text: "Architected to incorporate AI copilots, retrieval pipelines, and automation without rewrites.",
-  },
-];
-
-const testimonials = [
-  {
-    quote:
-      "Mncedisi ships fast without sacrificing polish. Our product felt premium and reliable from day one.",
-    name: "Product Lead",
-    company: "Streaming Startup",
-  },
-  {
-    quote:
-      "Clear communication, beautiful UI, and a clean codebase we could scale immediately.",
-    name: "Founder",
-    company: "Commerce Brand",
-  },
-  {
-    quote:
-      "The experience design elevated the entire brand. He thinks like a strategist and builds like an engineer.",
-    name: "Design Director",
-    company: "Digital Studio",
-  },
-];
-
-const toolbelt = [
-  "React",
-  "Vite",
-  "React Router",
-  "Next.js",
-  "Node.js",
-  "Express",
-  "MongoDB",
-  "PostgreSQL",
-  "Firebase",
-  "Tailwind",
-  "Framer Motion",
-  "Docker",
-  "Vercel",
-  "AWS",
-  "CI/CD",
-  "Testing",
 ];
 
 export default function Home() {
-  const [copied, setCopied] = useState(false);
-  const [copiedHero, setCopiedHero] = useState(false);
-  const [selectedProject, setSelectedProject] = useState(null);
-  const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "dark");
-
-  const marqueeItems = useMemo(() => toolbelt.concat(toolbelt), []);
+  const rootRef = useRef(null);
+  const heroRef = useRef(null);
+  const canvasRef = useRef(null);
 
   useEffect(() => {
-    document.body.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
-  }, [theme]);
+    const ctx = gsap.context(() => {
+      gsap.registerPlugin(ScrollTrigger);
 
-  useEffect(() => {
-    const elements = document.querySelectorAll("[data-animate]");
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("in-view");
-            observer.unobserve(entry.target);
-          }
+      gsap.from(".neon-nav", {
+        y: -30,
+        opacity: 0,
+        duration: 0.9,
+        ease: "power3.out",
+      });
+
+      gsap.from(".hero-core h1 span, .hero-core h1", {
+        y: 20,
+        opacity: 0,
+        duration: 1,
+        ease: "power3.out",
+        stagger: 0.08,
+        delay: 0.1,
+      });
+
+      gsap.from(".hero-subtitle, .hero-desc", {
+        y: 16,
+        opacity: 0,
+        duration: 0.9,
+        ease: "power2.out",
+        delay: 0.2,
+        stagger: 0.1,
+      });
+
+      gsap.from(".hero-actions a", {
+        y: 10,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power2.out",
+        delay: 0.3,
+        stagger: 0.12,
+      });
+
+      gsap.from(".panel", {
+        y: 24,
+        opacity: 0,
+        duration: 1.1,
+        ease: "power3.out",
+        stagger: 0.12,
+        delay: 0.15,
+      });
+
+      gsap.from(".skill-pill, .mini-card", {
+        scale: 0.9,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power2.out",
+        stagger: 0.05,
+        delay: 0.4,
+      });
+
+      gsap.from(".specialty-card", {
+        y: 20,
+        opacity: 0,
+        duration: 0.9,
+        ease: "power3.out",
+        stagger: 0.12,
+        delay: 0.2,
+      });
+
+      gsap.to(".grid-glow", {
+        opacity: 0.35,
+        duration: 6,
+        ease: "sine.inOut",
+        yoyo: true,
+        repeat: -1,
+      });
+
+      gsap.to(".orb-a", {
+        x: -20,
+        y: 30,
+        duration: 10,
+        ease: "sine.inOut",
+        yoyo: true,
+        repeat: -1,
+      });
+      gsap.to(".orb-b", {
+        x: 25,
+        y: -20,
+        duration: 12,
+        ease: "sine.inOut",
+        yoyo: true,
+        repeat: -1,
+      });
+      gsap.to(".orb-c", {
+        x: -15,
+        y: -25,
+        duration: 11,
+        ease: "sine.inOut",
+        yoyo: true,
+        repeat: -1,
+      });
+
+      gsap.utils.toArray(".section-title").forEach((title) => {
+        gsap.from(title, {
+          opacity: 0,
+          y: 25,
+          duration: 0.9,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: title,
+            start: "top 80%",
+          },
         });
-      },
-      { threshold: 0.15 }
-    );
+      });
 
-    elements.forEach((element) => observer.observe(element));
+      gsap.utils.toArray(".about-row, .specialties, .skills-showcase, .contact-row").forEach((section) => {
+        gsap.from(section, {
+          opacity: 0,
+          y: 40,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: section,
+            start: "top 80%",
+            toggleActions: "play none none reverse",
+          },
+        });
+      });
+    }, rootRef);
 
-    return () => observer.disconnect();
+    return () => ctx.revert();
   }, []);
 
   useEffect(() => {
-    if (!selectedProject) {
-      return undefined;
-    }
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return undefined;
 
-    const handleKey = (event) => {
-      if (event.key === "Escape") {
-        setSelectedProject(null);
-      }
+    const canvas = canvasRef.current;
+    if (!canvas) return undefined;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.z = 12;
+
+    const group = new THREE.Group();
+    scene.add(group);
+
+    const textureLoader = new THREE.TextureLoader();
+    textureLoader.crossOrigin = "anonymous";
+    const boxGeometry = new THREE.BoxGeometry(1, 1, 0.12);
+
+    const fallbackPalette = [
+      "#0ea5e9",
+      "#22c55e",
+      "#f97316",
+      "#a855f7",
+      "#eab308",
+      "#f43f5e",
+      "#38bdf8",
+      "#6366f1",
+      "#14b8a6",
+      "#f59e0b",
+    ];
+
+    const makeFallbackTexture = (label, color) => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 256;
+      canvas.height = 256;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "rgba(10, 15, 26, 0.95)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 6;
+      ctx.strokeRect(12, 12, canvas.width - 24, canvas.height - 24);
+      ctx.fillStyle = color;
+      ctx.font = "bold 96px Manrope, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(label.slice(0, 2).toUpperCase(), canvas.width / 2, canvas.height / 2);
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      return texture;
     };
 
-    document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, [selectedProject]);
+    const frontMeshes = [];
+    const logoMeshes = skillIcons.map((skill, i) => {
+      const fallbackTexture = makeFallbackTexture(skill.name, fallbackPalette[i % fallbackPalette.length]);
 
-  const handleCopy = async (setter) => {
-    await navigator.clipboard.writeText(emailAddress);
-    setter(true);
-    setTimeout(() => setter(false), 2000);
-  };
+      const frontMaterial = new THREE.MeshStandardMaterial({
+        map: fallbackTexture,
+        transparent: true,
+        alphaTest: 0.05,
+        roughness: 0.35,
+        metalness: 0.2,
+        emissiveMap: fallbackTexture,
+        emissive: new THREE.Color(0xffffff),
+        emissiveIntensity: 0.85,
+      });
+
+      const sideMaterial = new THREE.MeshStandardMaterial({
+        color: 0x0b1220,
+        roughness: 0.8,
+        metalness: 0.1,
+        transparent: true,
+        opacity: 0.9,
+      });
+
+      const materials = [
+        sideMaterial,
+        sideMaterial,
+        sideMaterial,
+        sideMaterial,
+        frontMaterial,
+        frontMaterial,
+      ];
+
+      const front = new THREE.Mesh(boxGeometry, materials);
+      frontMeshes.push(front);
+
+      const glowMaterial = new THREE.MeshBasicMaterial({
+        map: fallbackTexture,
+        transparent: true,
+        opacity: 0.35,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      });
+      const glowPlane = new THREE.Mesh(new THREE.PlaneGeometry(1.12, 1.12), glowMaterial);
+      glowPlane.position.z = 0.08;
+
+      const edgeMaterial = new THREE.LineBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.35,
+      });
+      const edgeGeo = new THREE.EdgesGeometry(boxGeometry);
+      const edges = new THREE.LineSegments(edgeGeo, edgeMaterial);
+
+      const logoGroup = new THREE.Group();
+      logoGroup.add(front, glowPlane, edges);
+      logoGroup.position.set(
+        (Math.random() - 0.5) * 14,
+        (Math.random() - 0.5) * 10,
+        (Math.random() - 0.5) * 10
+      );
+
+      const scale = 1.6 + (i % 4) * 0.45;
+      logoGroup.scale.setScalar(scale);
+      logoGroup.rotation.set(Math.random(), Math.random(), Math.random());
+      logoGroup.userData = {
+        baseZ: logoGroup.position.z,
+        baseScale: scale,
+        floatSpeed: 0.35 + Math.random() * 0.5,
+        floatOffset: Math.random() * Math.PI * 2,
+        spin: (Math.random() - 0.5) * 0.004,
+        frontMaterial,
+        glowMaterial,
+        sideMaterial,
+        edgeMaterial,
+      };
+      group.add(logoGroup);
+      return logoGroup;
+    });
+
+    skillIcons.forEach((skill, i) => {
+      textureLoader.load(
+        skill.logo,
+        (tex) => {
+          tex.colorSpace = THREE.SRGBColorSpace;
+          tex.anisotropy = 8;
+          const mesh = frontMeshes[i];
+          if (!mesh) return;
+          const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+          materials.forEach((mat) => {
+            if (mat.map) {
+              mat.map = tex;
+            }
+            if (mat.emissiveMap) {
+              mat.emissiveMap = tex;
+            }
+            mat.needsUpdate = true;
+          });
+          const glow = logoMeshes[i]?.userData?.glowMaterial;
+          if (glow) {
+            glow.map = tex;
+            glow.needsUpdate = true;
+          }
+        },
+        undefined,
+        () => {}
+      );
+    });
+
+    const keyLight = new THREE.PointLight(0xffffff, 1.6, 100);
+    keyLight.position.set(6, 6, 10);
+    const rimLight = new THREE.PointLight(0x38bdf8, 1.2, 100);
+    rimLight.position.set(-8, 4, 6);
+    const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(keyLight, rimLight, ambient);
+
+    const particleCount = 400;
+    const particleGeometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount * 3; i += 3) {
+      positions[i] = (Math.random() - 0.5) * 40;
+      positions[i + 1] = (Math.random() - 0.5) * 25;
+      positions[i + 2] = (Math.random() - 0.5) * 30;
+    }
+    particleGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    const particleMaterial = new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 0.05,
+      transparent: true,
+      opacity: 0.6,
+    });
+    const starField = new THREE.Points(particleGeometry, particleMaterial);
+    scene.add(starField);
+
+    const composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      0.35,
+      0.9,
+      0.2
+    );
+    composer.addPass(bloomPass);
+    const bokehPass = new BokehPass(scene, camera, {
+      focus: 12,
+      aperture: 0.00014,
+      maxblur: 0.006,
+    });
+    composer.addPass(bokehPass);
+
+    const onResize = () => {
+      const { innerWidth, innerHeight } = window;
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+      composer.setSize(innerWidth, innerHeight);
+      bloomPass.setSize(innerWidth, innerHeight);
+    };
+    onResize();
+    window.addEventListener("resize", onResize);
+
+    let frameId;
+    const clock = new THREE.Clock();
+    const mouse = new THREE.Vector2(0, 0);
+    const raycaster = new THREE.Raycaster();
+    let hovered = null;
+
+    const handleMouse = (event) => {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    };
+    window.addEventListener("mousemove", handleMouse);
+
+    const applyFocus = (mesh, focusFactor) => {
+      const { frontMaterial, glowMaterial, sideMaterial, edgeMaterial } = mesh.userData;
+      const baseOpacity = 0.45 + 0.55 * focusFactor;
+      frontMaterial.opacity = baseOpacity;
+      glowMaterial.opacity = 0.2 + 0.5 * focusFactor;
+      sideMaterial.opacity = 0.6 + 0.4 * focusFactor;
+      edgeMaterial.opacity = 0.2 + 0.5 * focusFactor;
+      frontMaterial.needsUpdate = true;
+      glowMaterial.needsUpdate = true;
+    };
+
+    const animate = () => {
+      const t = clock.getElapsedTime();
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects(frontMeshes, false);
+      hovered = hits.length ? hits[0].object.parent : null;
+
+      logoMeshes.forEach((mesh) => {
+        mesh.position.y += Math.sin(t * mesh.userData.floatSpeed + mesh.userData.floatOffset) * 0.002;
+        mesh.position.x += Math.cos(t * mesh.userData.floatSpeed + mesh.userData.floatOffset) * 0.0015;
+        mesh.rotation.y += mesh.userData.spin;
+        mesh.rotation.x += mesh.userData.spin * 0.6;
+        const targetScale = hovered === mesh ? mesh.userData.baseScale * 1.15 : mesh.userData.baseScale;
+        mesh.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.08);
+        const targetZ = mesh.userData.baseZ + (hovered === mesh ? 1.2 : 0);
+        mesh.position.z += (targetZ - mesh.position.z) * 0.08;
+
+        const depth = Math.abs(camera.position.z - mesh.position.z);
+        const focus = 1 - Math.min(Math.abs(depth - 12) / 6, 1);
+        applyFocus(mesh, focus);
+      });
+      group.rotation.y += 0.0012 + mouse.x * 0.0008;
+      group.rotation.x += 0.0004 + mouse.y * 0.0006;
+      starField.rotation.y += 0.0002;
+      composer.render();
+      frameId = requestAnimationFrame(animate);
+    };
+    animate();
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("mousemove", handleMouse);
+      renderer.dispose();
+      boxGeometry.dispose();
+      particleGeometry.dispose();
+      particleMaterial.dispose();
+      logoMeshes.forEach((logoGroup) => {
+        logoGroup.traverse((child) => {
+          if (child.isMesh) {
+            if (Array.isArray(child.material)) {
+              child.material.forEach((mat) => mat.dispose());
+            } else if (child.material && typeof child.material.dispose === "function") {
+              child.material.dispose();
+            }
+            if (child.geometry) {
+              child.geometry.dispose();
+            }
+          }
+        });
+      });
+    };
+  }, []);
+
+  useEffect(() => {
+    const hero = heroRef.current;
+    if (!hero) return undefined;
+
+    const handleMove = (event) => {
+      const bounds = hero.getBoundingClientRect();
+      const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+      const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+      gsap.to(".hero-core", {
+        rotateY: x * 8,
+        rotateX: -y * 8,
+        duration: 0.6,
+        ease: "power3.out",
+      });
+      gsap.to(".panel-left", {
+        rotateY: x * 5,
+        rotateX: -y * 4,
+        duration: 0.6,
+        ease: "power3.out",
+      });
+      gsap.to(".panel-right", {
+        rotateY: x * -5,
+        rotateX: -y * 4,
+        duration: 0.6,
+        ease: "power3.out",
+      });
+    };
+
+    const resetTilt = () => {
+      gsap.to(".hero-core, .panel-left, .panel-right", {
+        rotateX: 0,
+        rotateY: 0,
+        duration: 0.8,
+        ease: "power3.out",
+      });
+    };
+
+    hero.addEventListener("mousemove", handleMove);
+    hero.addEventListener("mouseleave", resetTilt);
+    return () => {
+      hero.removeEventListener("mousemove", handleMove);
+      hero.removeEventListener("mouseleave", resetTilt);
+    };
+  }, []);
 
   return (
-    <div className="page">
-      <div className="orb orb-1"></div>
-      <div className="orb orb-2"></div>
-      <div className="orb orb-3"></div>
+    <div className="neon-page" ref={rootRef}>
+      <canvas className="three-canvas" ref={canvasRef} aria-hidden="true"></canvas>
+      <div className="grid-glow" aria-hidden="true"></div>
+      <div className="orb orb-a" aria-hidden="true"></div>
+      <div className="orb orb-b" aria-hidden="true"></div>
+      <div className="orb orb-c" aria-hidden="true"></div>
 
-      <header className="hero" data-animate>
-        <nav className="nav">
-          <div className="logo">MAS</div>
-          <div className="nav-links">
-            <a href="#projects">Projects</a>
-            <a href="#skills">Skills</a>
-            <a href="#process">Process</a>
-            <a href="#toolbelt">Toolbelt</a>
-            <a href="#contact">Contact</a>
+      <header className="hero-stage" ref={heroRef}>
+        <div className="scanlines" aria-hidden="true"></div>
+        <div className="beam beam-left" aria-hidden="true"></div>
+        <div className="beam beam-right" aria-hidden="true"></div>
+        <nav className="neon-nav">
+          <div className="brand">Mncedisi</div>
+          <div className="nav-pills">
+            {navItems.map((item) => (
+              <a key={item} href={`#${item.toLowerCase()}`}>
+                {item}
+              </a>
+            ))}
           </div>
           <div className="nav-actions">
-            <button
-              className="ghost"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            >
-              {theme === "dark" ? "Light Mode" : "Dark Mode"}
-            </button>
-            <button className="cta" onClick={() => handleCopy(setCopiedHero)}>
-              {copiedHero ? "Email Copied" : "Copy Email"}
-            </button>
+            <a className="icon-pill" href="#home">EN</a>
+            <a className="hire-btn" href="#contact">Hire Me</a>
           </div>
         </nav>
 
-        <section className="hero-content">
-          <div className="hero-text" data-animate>
-            <p className="eyebrow">Full Stack Web Developer</p>
-            <h1>MNCEDISI AMBROSIA SIKHOSANA</h1>
-            <p className="lead">
-              I build world-class web platforms that feel effortless, look unforgettable,
-              and scale confidently. From UI systems to back-end architecture, I
-              translate big ideas into high-impact products.
+        <section className="hero-grid" id="home">
+          <aside className="panel panel-left">
+            <div className="panel-header">
+              <span className="panel-chip">Latest Projects</span>
+              <span className="panel-meta">Selected</span>
+            </div>
+            <div className="panel-cards">
+              {latestProjects.map((project) => (
+                <div key={project.title} className="mini-card">
+                  <h3>{project.title}</h3>
+                  <p>{project.subtitle}</p>
+                  <a className="mini-btn" href="#portfolio">View More</a>
+                </div>
+              ))}
+            </div>
+          </aside>
+
+          <div className="hero-core">
+            <div className="hero-badge">Welcome</div>
+            <h1>
+              WELCOME
+              <span>TO MY</span>
+              PORTFOLIO
+            </h1>
+            <p className="hero-subtitle">Creative UI/UX Designer + Full Stack Developer</p>
+            <p className="hero-desc">
+              I craft premium digital experiences using cinematic visuals, motion
+              storytelling, and production-grade engineering. Let's build a
+              portfolio that feels like a universe.
             </p>
             <div className="hero-actions">
-              <a className="primary" href="#projects">Explore Projects</a>
-              <a className="ghost" href="#contact">Let’s Collaborate</a>
-              <a
-                className="ghost ghost-outline"
-                href="https://www.linkedin.com/in/ambrosia-sikhosana-08aab3317"
-                target="_blank"
-                rel="noreferrer"
-              >
-                LinkedIn
-              </a>
+              <a className="neon-primary" href="#contact">Let's Connect</a>
+              <a className="neon-ghost" href="#portfolio">View Portfolio</a>
             </div>
-            <div className="stats">
+            <div className="hero-strip">
               <div>
-                <span className="stat-number">6+</span>
-                <span className="stat-label">Enterprise-grade builds</span>
+                <span>10+</span>
+                <p>Years Experience</p>
               </div>
               <div>
-                <span className="stat-number">12</span>
-                <span className="stat-label">Tech stacks mastered</span>
+                <span>45+</span>
+                <p>Brands Delivered</p>
               </div>
               <div>
-                <span className="stat-number">100%</span>
-                <span className="stat-label">Design-to-dev delivery</span>
+                <span>100%</span>
+                <p>Pixel Precision</p>
               </div>
             </div>
           </div>
-          <div className="hero-card" data-animate>
-            <div className="profile-frame">
-              <img src="/profile.jpg" alt="Portrait of Mncedisi Ambrosia Sikhosana" />
+
+          <aside className="panel panel-right">
+            <div className="panel-header">
+              <span className="panel-chip">Skills & Tools</span>
+              <span className="panel-meta">Design + Dev</span>
             </div>
-            <div className="availability">
-              <span className="pulse"></span>
-              Available for new roles and freelance partnerships
+            <div className="skill-grid">
+              {skillIcons.map((skill) => (
+                <span key={skill.name} className="skill-pill">
+                  {skill.name}
+                </span>
+              ))}
             </div>
-            <div className="highlights">
-              <div>
-                <h3>Product Focus</h3>
-                <p>Strategic, human-first, and measurable outcomes.</p>
-              </div>
-              <div>
-                <h3>Performance</h3>
-                <p>Optimized for speed, accessibility, and resilience.</p>
-              </div>
-              <div>
-                <h3>Modern Stack</h3>
-                <p>React, Node, cloud-first delivery, and scalable APIs.</p>
-              </div>
+            <div className="panel-footer">
+              <p>Tooling crafted for neon-grade visuals and production-ready builds.</p>
             </div>
-          </div>
+          </aside>
         </section>
       </header>
 
       <main>
-        <section className="section marquee" aria-label="Core stack">
-          <div className="marquee-track">
-            {marqueeItems.map((tool, index) => (
-              <span key={`${tool}-${index}`}>{tool}</span>
-            ))}
-          </div>
-        </section>
-
-        <section className="section impact" data-animate>
-          <div className="section-title">
-            <p>Impact</p>
-            <h2>Results that move the needle</h2>
-          </div>
-          <div className="impact-grid">
-            <div className="impact-card" data-animate>
-              <h3>35%+</h3>
-              <p>Average perceived performance boost from UI optimization</p>
+        <section className="about-row" id="about">
+          <div className="panel about-panel">
+            <div className="panel-header">
+              <span className="panel-chip">About Me</span>
+              <span className="panel-meta">Creative Tech</span>
             </div>
-            <div className="impact-card" data-animate>
-              <h3>3x</h3>
-              <p>Faster build velocity with component-driven systems</p>
-            </div>
-            <div className="impact-card" data-animate>
-              <h3>Top 10%</h3>
-              <p>Portfolio designs benchmarked against modern product studios</p>
-            </div>
+            <h2>Mncedisi Ambrosia Sikhosana</h2>
+            <p>
+              I design immersive brand universes and build the systems behind
+              them. From Figma to full-stack delivery, every frame is tuned for
+              impact.
+            </p>
+            <a className="neon-ghost" href="#contact">Know More</a>
+          </div>
+          <div className="panel focus-panel">
+            <h3>Design Stack</h3>
+            <ul>
+              <li>Figma, Blender, After Effects, Lottie</li>
+              <li>Motion UI, kinetic typography, storyboards</li>
+              <li>3D lighting, compositing, product visualization</li>
+            </ul>
+            <h3>Dev Stack</h3>
+            <ul>
+              <li>React + Vite, Tailwind CSS, Framer Motion</li>
+              <li>GSAP, optional Three.js for 3D web scenes</li>
+              <li>Optimized deployment and performance tuning</li>
+            </ul>
           </div>
         </section>
 
-        <section id="projects" className="section" data-animate>
+        <section className="specialties" id="portfolio">
           <div className="section-title">
-            <p>Recent Projects</p>
-            <h2>Bold builds for modern brands</h2>
+            <p>My Specialties</p>
+            <h2>Design, build, and animate.</h2>
           </div>
-          <div className="projects-grid">
-            {projects.map((project) => (
-              <article key={project.title} className="project-card" data-animate>
-                <div className={`project-cover ${project.cover}`}>
-                  <span>{project.title}</span>
-                </div>
-                <div className="project-tag">{project.tag}</div>
-                <h3>{project.title}</h3>
-                <p>{project.description}</p>
-                {project.link ? (
-                  <a className="project-link" href={project.link} target="_blank" rel="noreferrer">
-                    Visit Live Site
-                  </a>
-                ) : null}
-                <ul>
-                  {project.points.map((point) => (
-                    <li key={point}>{point}</li>
-                  ))}
-                </ul>
-                <button
-                  className="ghost project-cta"
-                  onClick={() => setSelectedProject(project)}
-                >
-                  View Case Study
-                </button>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section id="skills" className="section skills" data-animate>
-          <div className="section-title">
-            <p>Core Skills</p>
-            <h2>Everything a full stack partner should bring</h2>
-          </div>
-          <div className="skills-grid">
-            {skillGroups.map((group) => (
-              <div key={group.title} className="skill-group" data-animate>
-                <h3>{group.title}</h3>
-                <p>{group.body}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section id="process" className="section process" data-animate>
-          <div className="section-title">
-            <p>How I Work</p>
-            <h2>From vision to launch</h2>
-          </div>
-          <div className="process-steps">
-            {processSteps.map((step) => (
-              <div key={step.step} className="step" data-animate>
-                <span>{step.step}</span>
-                <h3>{step.title}</h3>
-                <p>{step.text}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section id="toolbelt" className="section toolbelt" data-animate>
-          <div className="section-title">
-            <p>Toolbelt</p>
-            <h2>Technologies I ship with</h2>
-          </div>
-          <div className="toolbelt-grid">
-            {toolbelt.map((tool) => (
-              <span key={tool} className="tool-pill" data-animate>{tool}</span>
-            ))}
-          </div>
-        </section>
-
-        <section className="section innovation" data-animate>
-          <div className="section-title">
-            <p>Innovation</p>
-            <h2>Signature capabilities</h2>
-          </div>
-          <div className="innovation-grid">
-            {innovations.map((item) => (
-              <div key={item.title} className="innovation-card" data-animate>
+          <div className="specialties-grid">
+            {specialties.map((item) => (
+              <div key={item.title} className="panel specialty-card">
                 <h3>{item.title}</h3>
                 <p>{item.text}</p>
+                <a className="mini-btn" href="#contact">Explore</a>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="section testimonials" data-animate>
+        <section className="skills-showcase" id="skills">
           <div className="section-title">
-            <p>Testimonials</p>
-            <h2>Trusted creative + engineering partner</h2>
+            <p>Skills</p>
+            <h2>Design + development systems.</h2>
           </div>
-          <div className="testimonials-grid">
-            {testimonials.map((item) => (
-              <div key={item.name} className="testimonial-card" data-animate>
-                <p className="testimonial-quote">“{item.quote}”</p>
-                <p className="testimonial-name">{item.name}</p>
-                <p className="testimonial-company">{item.company}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="section resume" data-animate>
-          <div className="section-title">
-            <p>Resume</p>
-            <h2>One-page overview</h2>
-          </div>
-          <div className="resume-card" data-animate>
-            <div>
-              <h3>Download my resume</h3>
-              <p>A clean, focused summary of roles, impact, and technical depth.</p>
+          <div className="panel skills-panel">
+            <div className="logo-grid">
+              {skillIcons.map((skill) => (
+                <div key={`logo-${skill.name}`} className="logo-card">
+                  <img src={skill.logo} alt={`${skill.name} logo`} loading="lazy" />
+                  <span>{skill.name}</span>
+                </div>
+              ))}
             </div>
-            <a className="primary" href="/resume.pdf" download>
+          </div>
+        </section>
+
+        <section className="contact-row" id="contact">
+          <div className="panel contact-panel">
+            <h2>Let's build your next universe.</h2>
+            <p>Email: ambrosiasikhosana@gmail.com</p>
+            <p>Location: Remote / Global</p>
+          </div>
+          <div className="panel contact-actions">
+            <a className="neon-primary" href="mailto:ambrosiasikhosana@gmail.com">
+              Book a Call
+            </a>
+            <a className="neon-ghost" href="/resume.pdf" download>
               Download Resume
             </a>
           </div>
         </section>
-
-        <section id="contact" className="section contact" data-animate>
-          <div className="section-title">
-            <p>Let’s Build</p>
-            <h2>Ready to create something remarkable?</h2>
-          </div>
-          <div className="contact-card" data-animate>
-            <div>
-              <h3>Let’s talk about your next platform.</h3>
-              <p>
-                Email: <strong>{emailAddress}</strong>
-              </p>
-              <p>
-                LinkedIn:{" "}
-                <a href="https://www.linkedin.com/in/ambrosia-sikhosana-08aab3317">
-                  linkedin.com/in/ambrosia-sikhosana-08aab3317
-                </a>
-              </p>
-              <p>
-                Instagram:{" "}
-                <a href="https://www.instagram.com/ambro.sia_/">
-                  instagram.com/ambro.sia_
-                </a>
-              </p>
-              <p>Phone: 0832288601</p>
-              <p>Location: Remote / Global</p>
-            </div>
-            <div className="contact-actions">
-              <button className="primary" onClick={() => handleCopy(setCopied)}>
-                {copied ? "Email Copied" : "Copy Email"}
-              </button>
-              <button
-                className="ghost"
-                onClick={() => window.open("/resume.pdf", "_blank")}
-              >
-                Download Resume
-              </button>
-            </div>
-          </div>
-        </section>
       </main>
 
-      {selectedProject ? (
-        <div
-          className="modal-overlay"
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setSelectedProject(null)}
-        >
-          <div className="modal" onClick={(event) => event.stopPropagation()}>
-            <button className="modal-close" onClick={() => setSelectedProject(null)}>
-              Close
-            </button>
-            <div className="modal-header">
-              <p className="project-tag">{selectedProject.tag}</p>
-              <h3>{selectedProject.title}</h3>
-              <p>{selectedProject.description}</p>
-            </div>
-            <div className="modal-body">
-              <div>
-                <h4>Role</h4>
-                <p>{selectedProject.role}</p>
-              </div>
-              <div>
-                <h4>Timeline</h4>
-                <p>{selectedProject.timeline}</p>
-              </div>
-              <div>
-                <h4>Stack</h4>
-                <p>{selectedProject.stack.join(", ")}</p>
-              </div>
-              <div>
-                <h4>Outcome</h4>
-                <p>{selectedProject.outcome}</p>
-              </div>
-            </div>
-            {selectedProject.link ? (
-              <a
-                className="primary"
-                href={selectedProject.link}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Visit Live Site
-              </a>
-            ) : null}
-          </div>
-        </div>
-      ) : null}
-
-      <footer className="footer">
-        <p>© 2026 Mncedisi Ambrosia Sikhosana. Crafted with precision, empathy, and ambitious ideas.</p>
+      <footer className="neon-footer">
+        (c) 2026 Mncedisi Ambrosia Sikhosana. Crafted for bold digital experiences.
       </footer>
     </div>
   );
