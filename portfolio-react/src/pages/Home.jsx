@@ -580,7 +580,7 @@ export default function Home() {
             </div>
             <div className="hero-strip">
               <div>
-                <span>10+</span>
+                <span>2+</span>
                 <p>Years Experience</p>
               </div>
               <div>
