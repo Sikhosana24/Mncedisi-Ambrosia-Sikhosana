@@ -497,6 +497,63 @@ button {
   box-shadow: 0 18px 40px rgba(2, 6, 23, 0.6);
 }
 
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.page-btn {
+  background: rgba(6, 10, 20, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  color: var(--text);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.page-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.page-btn:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(2, 6, 23, 0.6);
+}
+
+.page-dots {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.page-dot {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: transparent;
+  color: var(--text);
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.page-dot.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #03131f;
+  border-color: transparent;
+  box-shadow: 0 10px 24px rgba(56, 189, 248, 0.35);
+}
+
+.page-dot:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(2, 6, 23, 0.5);
+}
+
 .contact-panel h2 {
   font-family: "Sora", sans-serif;
   margin-bottom: 10px;

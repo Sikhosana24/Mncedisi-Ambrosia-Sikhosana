@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import * as THREE from "three";
@@ -52,6 +52,11 @@ export default function Home() {
   const rootRef = useRef(null);
   const heroRef = useRef(null);
   const canvasRef = useRef(null);
+  const [skillsPage, setSkillsPage] = useState(1);
+  const skillsPerPage = 6;
+  const totalSkillPages = Math.max(1, Math.ceil(skillIcons.length / skillsPerPage));
+  const skillPageStart = (skillsPage - 1) * skillsPerPage;
+  const pagedSkills = skillIcons.slice(skillPageStart, skillPageStart + skillsPerPage);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -667,12 +672,47 @@ export default function Home() {
           </div>
           <div className="panel skills-panel">
             <div className="logo-grid">
-              {skillIcons.map((skill) => (
+              {pagedSkills.map((skill) => (
                 <div key={`logo-${skill.name}`} className="logo-card">
                   <img src={skill.logo} alt={`${skill.name} logo`} loading="lazy" />
                   <span>{skill.name}</span>
                 </div>
               ))}
+            </div>
+            <div className="pagination">
+              <button
+                className="page-btn"
+                type="button"
+                onClick={() => setSkillsPage((page) => Math.max(1, page - 1))}
+                disabled={skillsPage === 1}
+              >
+                Prev
+              </button>
+              <div className="page-dots" role="tablist" aria-label="Skills pages">
+                {Array.from({ length: totalSkillPages }, (_, index) => {
+                  const pageNumber = index + 1;
+                  return (
+                    <button
+                      key={`skill-page-${pageNumber}`}
+                      type="button"
+                      className={`page-dot${skillsPage === pageNumber ? " active" : ""}`}
+                      onClick={() => setSkillsPage(pageNumber)}
+                      aria-label={`Go to skills page ${pageNumber}`}
+                      aria-pressed={skillsPage === pageNumber}
+                    >
+                      {pageNumber}
+                    </button>
+                  );
+                })}
+              </div>
+              <button
+                className="page-btn"
+                type="button"
+                onClick={() => setSkillsPage((page) => Math.min(totalSkillPages, page + 1))}
+                disabled={skillsPage === totalSkillPages}
+              >
+                Next
+              </button>
             </div>
           </div>
         </section>
